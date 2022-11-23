@@ -8,6 +8,7 @@ pub struct Node {
 
 impl Node {
     pub fn new(
+        symbol: Option<usize>,
         probability: f32,
         bit: Option<u8>,
         right: Option<Box<Node>>,
@@ -33,6 +34,6 @@ impl Node {
         f_node.bit = Some(1);
         s_node.bit = Some(0);
 
-        Box::new(Node::new(new_probability, None, Some(f_node), Some(s_node)))
+        Box::new(Node::new(None, new_probability, None, Some(f_node), Some(s_node)))
     }
 }

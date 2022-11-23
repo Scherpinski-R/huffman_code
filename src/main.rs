@@ -19,6 +19,20 @@ fn find_position(v: &Vec<Box<Node>>, k: f32) -> usize {
     return pos;
 }
 
+const MIN_PROBABILITY_SUM: f32 = 0.99;
+fn ensure_probability_sum(args: &Vec<String>, size: usize) {
+    let mut acc: f32= 0.0;
+    for i in 1..size {
+        let number: f32 = args[i].parse().unwrap();
+        acc = acc + number;
+    }
+
+    if acc < MIN_PROBABILITY_SUM {
+        println!("Please ensure the sum of probabilities is at least {}", MIN_PROBABILITY_SUM);
+        process::exit(1);
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     let size = args.len();
@@ -28,12 +42,15 @@ fn main() {
         process::exit(1);
     }
 
+    // Quit if probability given is < MIN_PROBABILITY_SUM 
+    ensure_probability_sum(&args, size);
+
     let mut symbols: Vec<Box<Node>> = Vec::new();
     
     for i in 1..size {
         let number: f32 = args[i].parse().unwrap();
         let pos = find_position(&symbols, number); 
-        symbols.insert(pos, Box::new(Node::new(number, None, None, None)));
+        symbols.insert(pos, Box::new(Node::new(Some(i-1), number, None, None, None)));
     } 
    
     loop {
@@ -51,7 +68,5 @@ fn main() {
         symbols.insert(pos, new_value);
     }
     
-    println!("Final probability should be 1, and it's: {}", symbols[0].probability);
-
     //TODO: Run throught the Tree and display code for each symbol(i)
 }

@@ -6,6 +6,19 @@ use crate::binary_tree::Node;
 
 pub mod binary_tree;
 
+fn find_position(v: &Vec<Box<Node>>, k: f32) -> usize {
+    let mut pos: usize = 0; 
+    while pos < v.len() {
+        if k < v[pos].probability {
+            return pos; 
+        }
+
+        pos = pos + 1;
+    }
+
+    return pos;
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     let size = args.len();
@@ -19,21 +32,26 @@ fn main() {
     
     for i in 1..size {
         let number: f32 = args[i].parse().unwrap();
-        println!("{}", number); 
-        //TODO: Insert symbols probabilities in Vector
-        //let val1 = Box::new(Node::new(0.42, None, None, None));
-        //let val2 = Box::new(Node::new(0.16, None, None, None));
+        let pos = find_position(&symbols, number); 
+        symbols.insert(pos, Box::new(Node::new(number, None, None, None)));
     } 
-    
-    //let new_value = Node::join_nodes(val1, val2);
-
+   
     loop {
         let n = symbols.len();
         
         if n < 2 {
             break;
         }
-        // TODO: Remove the last 2 elements ( smaller probability ) 
-        // join_nodes -> insert new in Vector
+        
+        let f_node = symbols.remove(n-1);
+        let s_node = symbols.remove(n-2);
+
+        let new_value = Node::join_nodes(f_node, s_node);
+        let pos = find_position(&symbols, new_value.probability);
+        symbols.insert(pos, new_value);
     }
+    
+    println!("Final probability should be 1, and it's: {}", symbols[0].probability);
+
+    //TODO: Run throught the Tree and display code for each symbol(i)
 }

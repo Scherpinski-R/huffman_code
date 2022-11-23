@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct Node {
     pub symbol: Option<usize>,
     pub probability: f32,
@@ -32,11 +33,27 @@ impl Node {
     
     const LEFT_PATH_VALUE:  u8 = 1;
     const RIGHT_PATH_VALUE: u8 = 0;
-    pub fn join_nodes(mut f_node: Box<Node>, mut s_node: Box<Node>) -> Box<Node> {
-        let new_probability = f_node.probability + s_node.probability;
-        f_node.bit = Some(Node::LEFT_PATH_VALUE);
-        s_node.bit = Some(Node::RIGHT_PATH_VALUE);
+    pub fn join_nodes(mut left_node: Box<Node>, mut right_node: Box<Node>) -> Box<Node> {
+        let new_probability = right_node.probability + left_node.probability;
+        right_node.bit = Some(Node::RIGHT_PATH_VALUE);
+        left_node.bit = Some(Node::LEFT_PATH_VALUE);
+        
+        println!("joining p {} - {:?} and p {} - {:?}", right_node.probability, right_node.bit, left_node.probability, left_node.bit);
 
-        Box::new(Node::new(None, new_probability, None, Some(f_node), Some(s_node)))
+        Box::new(Node::new(None, new_probability, None, Some(right_node), Some(left_node)))
+    }
+
+    pub fn dfs_tree(my_node: Node, coding: &mut Vec< Option<Vec<u8>>>, aux: &mut Vec<u8>) { 
+        aux.push(my_node.bit.unwrap());
+        println!("Vector inside dfs {:?} - myprob: {}", aux, my_node.probability);
+        if my_node.is_leaf() {
+            coding[my_node.symbol.unwrap()] = Some(aux.clone());
+            return;
+        }
+
+        Self::dfs_tree(*my_node.right.unwrap(), coding, aux);
+        aux.pop();
+        Self::dfs_tree(*my_node.left.unwrap(), coding, aux);
+        aux.pop();
     }
 }
